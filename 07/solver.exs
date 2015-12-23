@@ -46,21 +46,21 @@ defmodule SolverSeven do
       if complete?(op) do
         x = parse_integer(op[:x])
         y = parse_integer(op[:y])
+        operator = op[:operator] |> String.downcase |> String.to_atom
 
-        new_cache = case op[:operator] do
-          "AND" ->
+        case operator do
+          :and ->
             Dict.put(cache, op[:dest], band(x, y))
-          "NOT" ->
+          :not ->
             Dict.put(cache, op[:dest], bnot(x))
-          "RSHIFT" ->
+          :rshift ->
             Dict.put(cache, op[:dest], bsr(x, y))
-          "LSHIFT" ->
+          :lshift ->
             Dict.put(cache, op[:dest], bsl(x, y))
-          "OR" ->
+          :or ->
             Dict.put(cache, op[:dest], bor(x, y))
         end
-
-        parse_signals(new_cache, tl(operations))
+          |> parse_signals(tl(operations))
       else
         ops = Enum.concat(tl(operations), [get_wire_values(cache, op)])
         parse_signals(cache, ops)
