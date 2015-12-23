@@ -49,16 +49,11 @@ defmodule SolverSeven do
         operator = op[:operator] |> String.downcase |> String.to_atom
 
         case operator do
-          :and ->
-            Dict.put(cache, op[:dest], band(x, y))
-          :not ->
-            Dict.put(cache, op[:dest], bnot(x))
-          :rshift ->
-            Dict.put(cache, op[:dest], bsr(x, y))
-          :lshift ->
-            Dict.put(cache, op[:dest], bsl(x, y))
-          :or ->
-            Dict.put(cache, op[:dest], bor(x, y))
+          :and    -> Dict.put(cache, op[:dest], band(x, y))
+          :not    -> Dict.put(cache, op[:dest], bnot(x))
+          :rshift -> Dict.put(cache, op[:dest], bsr(x, y))
+          :lshift -> Dict.put(cache, op[:dest], bsl(x, y))
+          :or     -> Dict.put(cache, op[:dest], bor(x, y))
         end
           |> parse_signals(tl(operations))
       else
