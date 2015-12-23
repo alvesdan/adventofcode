@@ -4,10 +4,18 @@ defmodule SolverSix do
     {:ok, input} = File.read("input.txt")
     instructions = input |> String.split("\n", trim: true)
 
-    Enum.reduce(instructions, state, fn(inst, state) ->
+    result = Enum.reduce(instructions, state, fn(inst, state) ->
       IO.puts inst
       interact(state, inst)
-    end) |> Dict.values |> Enum.filter(fn(x) -> x end) |> Enum.count
+    end) |> Dict.values
+
+    brightness = result |> Enum.reduce(0, fn(x, acc) -> acc + x[:brightness] end)
+    turned_on = result |> Enum.filter(fn(x) -> x[:on] end) |> Enum.count
+
+    [
+      turned_on: turned_on,
+      brightness: brightness
+    ]
   end
 
   defp interact(state, "") do
@@ -15,18 +23,16 @@ defmodule SolverSix do
   end
 
   defp interact(state, inst) do
-    [start, finish] = parse_instruction(inst)
     cond do
-      String.starts_with?(inst, "turn on") -> update_state(state, start, finish, :on)
-      String.starts_with?(inst, "turn off") -> update_state(state, start, finish, :off)
-      String.starts_with?(inst, "toggle") -> update_state(state, start, finish, :toggle)
+      String.starts_with?(inst, "turn on") -> update_state(state, inst, :on)
+      String.starts_with?(inst, "turn off") -> update_state(state, inst, :off)
+      String.starts_with?(inst, "toggle") -> update_state(state, inst, :toggle)
       true -> state
     end
   end
 
-  defp update_state(state, start, finish, value) do
-    [x0, y0] = start
-    [x1, y1] = finish
+  defp update_state(state, inst, value) do
+    [x0, y0, x1, y1] = parse_instruction(inst)
 
     Enum.map(x0..x1, fn(x) ->
       Enum.map(y0..y1, fn(y) ->
@@ -35,10 +41,11 @@ defmodule SolverSix do
     end) |> List.flatten
     |> Enum.reduce(state, fn(light, new_state) ->
         {_, dict} = Dict.get_and_update(new_state, light, fn(v) ->
+          [on: on, brightness: brightness] = v
           case value do
-            :on -> {true, true}
-            :off -> {false, false}
-            :toggle -> {!v, !v}
+            :on -> {v, [on: true, brightness: brightness + 1]}
+            :off -> {v, [on: false, brightness: Enum.max([0, brightness - 1])]}
+            :toggle -> {v, [on: !on, brightness: brightness + 2]}
             _ -> {v, v}
           end
         end)
@@ -48,10 +55,9 @@ defmodule SolverSix do
   end
 
   defp parse_instruction(inst) do
-    Regex.scan(~r/[0-9,]+/, inst)
+    Regex.scan(~r/[0-9]+/, inst)
       |> List.flatten
-      |> Enum.map(fn(x) -> x |> String.split(",", trim: true) end)
-      |> Enum.map(fn(x) -> Enum.map(x, &String.to_integer/1) end)
+      |> Enum.map(&String.to_integer/1)
   end
 
   defp grid do
@@ -65,7 +71,7 @@ defmodule SolverSix do
   defp lights do
     Enum.reduce(grid, %{}, fn(l, dict) ->
       key = to_string(l[:x]) <> "x" <> to_string(l[:y])
-      Dict.put_new(dict, key, false)
+      Dict.put_new(dict, key, [on: false, brightness: 0])
     end)
   end
 end
