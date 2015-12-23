@@ -1,30 +1,21 @@
 defmodule SolverThree do
   def solve do
     {:ok, input} = File.read("input.txt")
-    state = [%{x: 0, y: 0}, [%{x: 0, y: 0}]]
-    chars = String.split(input, "")
-    houses = visit(state, chars)
-    Enum.count(Enum.uniq(houses))
-  end
+    chars = String.split(input, "", trim: true)
 
-  def visit(state, []) do
-    [_, visited] = state
-    visited
-  end
+    Enum.reduce(chars, [%{x: 0, y: 0}], fn(c, acc) ->
+      current = List.last(acc)
+      [x, y] = [current[:x], current[:y]]
+      moved = case c do
+        "^" -> %{x: x, y: y + 1}
+        ">" -> %{x: x + 1, y: y}
+        "v" -> %{x: x, y: y - 1}
+        "<" -> %{x: x - 1, y: y}
+        _   -> %{x: x, y: y}
+      end
 
-  def visit(state, list) do
-    [visiting, visited] = state
-    x = visiting[:x]
-    y = visiting[:y]
-    movement = hd(list)
-
-    case movement do
-      "^" -> visit([%{x: x, y: y + 1}, Enum.concat(visited, [%{x: x, y: y + 1}])], tl(list))
-      ">" -> visit([%{x: x + 1, y: y}, Enum.concat(visited, [%{x: x + 1, y: y}])], tl(list))
-      "v" -> visit([%{x: x, y: y - 1}, Enum.concat(visited, [%{x: x, y: y - 1}])], tl(list))
-      "<" -> visit([%{x: x - 1, y: y}, Enum.concat(visited, [%{x: x - 1, y: y}])], tl(list))
-      _   -> visit(state, tl(list))
-    end
+      Enum.concat(acc, [moved])
+    end) |> Enum.uniq |> Enum.count
   end
 end
 
