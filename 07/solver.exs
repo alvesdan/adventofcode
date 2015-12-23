@@ -10,7 +10,7 @@ defmodule SolverSeven do
   def solve do
     {:ok, input} = File.read("input.txt")
     instructions = String.split(input, "\n", trim: true)
-    parse_signals(%{}, parse_operations(instructions))
+    parse_signals(%{"b" => 16076}, parse_operations(instructions))
   end
 
   def parse_operations(instructions) do
@@ -40,7 +40,7 @@ defmodule SolverSeven do
     signal = parse_integer(op[:signal])
 
     if signal do
-      dict = Dict.put(cache, op[:dest], signal)
+      dict = Dict.put_new(cache, op[:dest], signal)
       parse_signals(dict, tl(operations))
     else
       if complete?(op) do
