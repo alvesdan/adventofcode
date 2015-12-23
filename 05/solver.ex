@@ -24,7 +24,7 @@ defmodule SolverFive do
   defp letters?(string) do
     letters = String.split("qwertyuiopasdfghjklzxcvbnm", "", trim: true)
      Enum.any?(letters, fn(l) ->
-       String.contains? string, "#{l}#{l}"
+       String.contains? string, l <> l
      end)
   end
 
