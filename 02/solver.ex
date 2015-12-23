@@ -15,13 +15,13 @@ defmodule SolverTwo do
     2*l*w + 2*w*h + 2*h*l + extra
   end
 
+  defp dimensions("") do
+    [0, 0, 0]
+  end
+
   defp dimensions(box) do
-    if Regex.match?(~r/[0-9]/, box) do
-      String.strip(box)
-        |> String.split("x", trim: true)
-        |> Enum.map(&String.to_integer/1)
-    else
-      [0, 0, 0]
-    end
+    String.strip(box)
+      |> String.split("x", trim: true)
+      |> Enum.map(&String.to_integer/1)
   end
 end
