@@ -22,10 +22,7 @@ defmodule SolverFive do
   end
 
   defp letters?(string) do
-    letters = String.split("qwertyuiopasdfghjklzxcvbnm", "", trim: true)
-     Enum.any?(letters, fn(l) ->
-       String.contains? string, l <> l
-     end)
+     Regex.match?(~r/(.)\1/, string)
   end
 
   defp allowed?(string) do
