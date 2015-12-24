@@ -21,7 +21,7 @@ defmodule SolverNine do
   defp cities(lines) do
     Enum.reduce(lines, [], fn(line, acc) ->
       case Regex.run(~r/(\w+) to (\w+) = (\d+)/, line) do
-        [_, a, b, distance] ->
+        [_, a, b, _] ->
           Enum.uniq(Enum.concat(acc, [a,b]))
         _ -> acc
       end
@@ -33,7 +33,6 @@ defmodule SolverNine do
       case Regex.run(~r/(\w+) to (\w+) = (\d+)/, line) do
         [_, a, b, distance] ->
           Dict.put acc, {a, b}, String.to_integer(distance)
-          Dict.put acc, {b, a}, String.to_integer(distance)
         _ -> acc
       end
     end)
