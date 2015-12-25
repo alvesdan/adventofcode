@@ -2,37 +2,30 @@ defmodule SolverNine do
   def solve do
     {:ok, input} = File.read("input.txt")
     lines = String.split(input, "\n", trim: true)
-    dis = distances(lines)
+    [cities, distances] = parse(lines)
 
-    Enum.reduce(permutations(cities(lines)), [], fn(route, acc) ->
+    Enum.reduce(permutations(cities), [], fn(route, acc) ->
       distance = Enum.reduce(route, [0, 0], fn(a, acc) ->
         [index, total] = acc
         b = Enum.at(route, index + 1)
         case b do
           nil -> [index + 1, total]
-          _   -> [index + 1, total + (dis[{a, b}] || dis[{b, a}])]
+          _   -> [index + 1, total + (distances[{a, b}] || distances[{b, a}])]
         end
       end) |> List.last
 
-      Enum.concat(acc, [distance])
+      acc ++ [distance]
     end) |> Enum.max
   end
 
-  defp cities(lines) do
-    Enum.reduce(lines, [], fn(line, acc) ->
-      case Regex.run(~r/(\w+) to (\w+) = (\d+)/, line) do
-        [_, a, b, _] ->
-          Enum.uniq(Enum.concat(acc, [a,b]))
-        _ -> acc
-      end
-    end)
-  end
+  defp parse(lines) do
+    Enum.reduce(lines, [[], %{}], fn(line, acc) ->
+      [cities, distances] = acc
 
-  def distances(lines) do
-    Enum.reduce(lines, %{}, fn(line, acc) ->
       case Regex.run(~r/(\w+) to (\w+) = (\d+)/, line) do
         [_, a, b, distance] ->
-          Dict.put acc, {a, b}, String.to_integer(distance)
+          [ Enum.uniq(cities ++ [a,b]),
+            Dict.put(distances, {a, b}, String.to_integer(distance)) ]
         _ -> acc
       end
     end)
