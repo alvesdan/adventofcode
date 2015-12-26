@@ -23,12 +23,9 @@ defmodule SolverSeven do
     run = Regex.run(r, inst)
     case run do
       nil -> parse_operation(inst, tail)
-      [_, signal, dest] ->
-        %{ operator: :signal, signal: signal, dest: dest }
-      [_, x, operator, y, dest] ->
-        %{ operator: operator, x: x, y: y, dest: dest }
-      [_, operator, x, dest] ->
-        %{ operator: operator, x: x, dest: dest }
+      [_, signal, dest] -> %{ operator: :signal, signal: signal, dest: dest }
+      [_, x, operator, y, dest] -> %{ operator: operator, x: x, y: y, dest: dest }
+      [_, operator, x, dest] -> %{ operator: operator, x: x, dest: dest }
     end
   end
 
